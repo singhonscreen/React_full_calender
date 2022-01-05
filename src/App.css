@@ -91,6 +91,34 @@
   box-shadow: 2px 2px 2px rgb(247, 240, 240);
   border-radius: 4px;
 }
+.editbtnContainer{
+  height: 36px;
+    width: 100%;
+    background-color: #f1f3f4;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.headerModal{
+  font-size: 22px;
+  margin: 0 10px;
+  padding: 0 5px;
+}
+.deatailsModal{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.eventContainer{
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 20px;
+
+}
+.title{
+  display: flex;
+  justify-self: flex-start;
+}
 .timeContainer{
   padding: 10px;
 }
@@ -126,5 +154,34 @@
 
 .fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link{
     width: 95% !important;
+    /* margin-left: 100px; */
     
+}
+/* .fc-timegrid-event-harness{
+  position: absolute ;
+  left: 10% !important;
+  width: 10rem;
+} */
+
+.contentHandle{
+  /* display: flex; */
+  /* align-items: flex-end; */
+  /* justify-content: center; */
+}
+.contentHandle div {
+  transform: rotate( 
+-90deg) !important;
+  background-color: rgb(241, 101, 206);
+  width: 50% !important;
+  margin: auto -32px;
+  border-radius: 5px;
+  margin-top: 20%;
+  position: absolute;
+  left: -10%;
+  top: 2%;
+  text-align: center;
+  z-index: 222;
+}
+.data{
+  margin-left: auto;
 }
