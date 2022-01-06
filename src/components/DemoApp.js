@@ -24,79 +24,120 @@ const events = [
   },
 ];
 function getTimeZone() {
-  var offset = new Date().getTimezoneOffset(), o = Math.abs(offset);
+  var offset = new Date().getTimezoneOffset(),
+    o = Math.abs(offset);
   // console.log(o);
   // console.log(offset);
-  return (offset < 0 ? "+" : "-") + ("00" + Math.floor(o / 60)).slice(-2) + ":" + ("00" + (o % 60)).slice(-2);
+  return (
+    (offset < 0 ? "+" : "-") +
+    ("00" + Math.floor(o / 60)).slice(-2) +
+    ":" +
+    ("00" + (o % 60)).slice(-2)
+  );
 }
 function FullCalendarApp() {
   const [state, setState] = useState(events);
-  const [state1, setState1] = useState("");
-  const [state2, setState2] = useState("");
+  const [uniqueEvent, setUniqueEvent] = useState("");
+  const [startTime, setStartTime] = useState("");
   const [isModal, setModal] = useState(false);
   const [endTime, setendTime] = useState("");
-  const [select, setSelect] = useState("Select");
   const [iseditable, setIseditable] = useState(false);
   const [event_Color, setEvent_Color] = useState("");
-  const [myTime, setMyTime] = useState(null)
-  const [myTime1, setMyTime1] = useState(null)
-  const [detailModal, setDetailModal] = useState(false)
-  const [range,setRange] = useState({start:new Date(), end: new Date() })
-  // const [jsxdata, setJsxData] = useState(eventContentHandle)
-  console.log(myTime1);
-  console.log(myTime);
-console.log(endTime);
-console.log(state2);
- function increasedate(){ //Increasing date according to condition
+  const [increasedTime, setIncreasedTime] = useState(null);
+  const [increaseEncounterTime, setIncreaseEncounterTime] = useState(null);
+  const [detailModal, setDetailModal] = useState(false);
+  const [range, setRange] = useState({ start: new Date(), end: new Date() });
+  const [jsxdata, setJsxData] = useState(null)
+  const [select, setSelect] = useState('New Title');
+  // console.log(myTime1);
+  // console.log(myTime);
+  // console.log(endTime);
+  // console.log(state2);
+  // function defaultIncreaseTime(){
+  //   return setMyTime(myTime1 + 900000);
+  // }
+  const increasedate = async (increasedMainDate) => {
     if (select === "Well Visit") {
-      setMyTime(myTime1 + 600000);
+      increasedMainDate = increasedMainDate + 600000;
     } else if (select === "New Patient") {
-      setMyTime(myTime1 + 1800000);
+      increasedMainDate = increasedMainDate + 1800000;
     } else if (select === "Evaluation") {
-      setMyTime(myTime1 + 1200000);
+      increasedMainDate = increasedMainDate + 1200000;
     } else if (select === "Progress") {
-      setMyTime(myTime1 + 900000);
+      increasedMainDate = increasedMainDate + 900000;
+    } else {
+      increasedMainDate = increasedMainDate + 1800000;
     }
-  }
-  function dynamicDate(){ // For Changing date format after increasing date
-    var enddate = new Date(myTime);
-    var d = enddate,
-    dformat = [d.getFullYear(),
-                     ("00" + (d.getMonth()+1)).slice(-2),
-                     ("00" +  d.getDate()).slice(-2)
-                  ].join('-')+
-        'T' +
-        [ ("00" + d.getHours()).slice(-2),
-         ("00" + d.getMinutes()).slice(-2),
-         ("00" + d.getSeconds()).slice(-2)].join(':')+getTimeZone();
-    setendTime(dformat);
-  }
-  const handleDateClick = (arg) => { // First click on date or time slot
-    
-    setState([...state, {id: Math.floor(Math.random() * 99999),title:'New Title', start:arg.dateStr,end: myTime}])
-    console.log(state);
-    setModal(true);
-    const maindate = Date.parse(arg.dateStr);
-    setMyTime1(maindate)
-    setState2(arg.dateStr);
+    return increasedMainDate;
   };
-  
-  
-  const selectHandle = (elem) => {
-    setSelect(elem);
+  const dynamicDate = async (increaseTime) => {
+    var enddate = new Date(increaseTime),
+      dformat =
+        [
+          enddate.getFullYear(),
+          ("00" + (enddate.getMonth() + 1)).slice(-2),
+          ("00" + enddate.getDate()).slice(-2),
+        ].join("-") +
+        "T" +
+        [
+          ("00" + enddate.getHours()).slice(-2),
+          ("00" + enddate.getMinutes()).slice(-2),
+          ("00" + enddate.getSeconds()).slice(-2),
+        ].join(":") +
+        getTimeZone();
+    return dformat;
   };
-// useEffect(() => {
-  
-  
-// }, [handleDateClick]);
-  useEffect(() => { //Setting states before rendering
-    increasedate()
-    dynamicDate()
-    event_color();
-  }, [selectHandle]);
 
-  const submitData = () => { //data addition into an array
-   
+  const addEvent = async (endtime, starttime) => {
+    
+   return   {
+        id: Math.floor(Math.random() * 99999),
+        title: "New Title",
+        start: starttime,
+        end: endtime,
+        canDrop: true,
+        overlap: false,
+        rendering: "background",
+        color: event_Color,
+      }
+  
+    // setModal(true);
+    // setDetailModal(true);
+  };
+ 
+  const handleDateClick = async (arg) => {
+    const maindate = Date.parse(arg.dateStr);
+    setStartTime(arg.dateStr);
+    setIncreaseEncounterTime(maindate);
+    let increasedMainDate = await increasedate(maindate);
+    let endtimeDate = await dynamicDate(increasedMainDate);
+  let newEvent =  await addEvent(endtimeDate, arg.dateStr);
+  setState([...state, newEvent])
+ 
+  // console.log(newEvent);
+  // console.log(newEvent.id);
+  setJsxData(newEvent)
+  setModal(true);
+  };
+
+  const selectHandle = (elem) => {
+    setSelect(elem.title);
+  };
+  // useEffect(() => {
+  //   increasedate()
+  //   dynamicDate()
+
+  // }, [handleDateClick]);
+  // useEffect(() => {
+  //   //Setting states before rendering
+  //   increasedate();
+  //   dynamicDate();
+  //   event_color();
+  // }, [selectHandle]);
+
+  const submitData = () => {
+    //data addition into an array
+
     if (isModal && select === "Select") {
       alert("Please Choose 1");
       return null;
@@ -119,7 +160,7 @@ console.log(state2);
         {
           id: Math.floor(Math.random() * 99999),
           title: select,
-          start: state2,
+          start: startTime,
           end: endTime,
           canDrop: true,
           overlap: false,
@@ -130,14 +171,15 @@ console.log(state2);
     }
     setModal(false);
   };
-  const openModal =(id)=>{ //Event  data show on modal
+  const openModal = (id) => {
+    //Event  data show on modal
     const editEvent = state.filter((elem) => {
       return elem.id == id;
     });
-    setState1(editEvent[0]);
+    setUniqueEvent(editEvent[0]);
     event_color();
     setDetailModal(true);
-  }
+  };
   // const editHandle = (id) => {
   //   const editEvent = state.filter((elem) => {
   //     return elem.id == id;
@@ -145,32 +187,54 @@ console.log(state2);
   //   setState1(editEvent[0]);
   //   setIseditable(true);
   // };
-   const deleteEventHandle =(id)=>{ // Delete function
-    const deleteItem = state.filter((item)=>{
-       return item.id !== id
-     })
-     setState(deleteItem)
-    setDetailModal(false);
-
-   }
-  const editDate = (id, start, end) => { //edit date and time
+  const deleteEventHandle = (id) => {
+    // Delete function
+    const deleteItem = state.filter((item) => {
+      return item.id !== id;
+    });
+    setState(deleteItem);
+    setModal(false)
+  };
+  const editDate = (id, start, end,title) => {
+    
     debugger;
-    if (iseditable ) {
       const asb = state.map((elem) => {
         if (elem.id === id) {
           elem.start = start;
           elem.end = end;
+          elem.title = title;
         }
         return elem;
       });
       setState([...state, asb]);
-    }
-    setDetailModal(false)
-    setIseditable(false);
+    
+    setDetailModal(false);
+    setModal(false);
   };
-  const event_color = () => { //set color according to select
+
+  const onChangeNewEncounter = (value)=>{
+    setSelect(value)
+  }
+  useEffect(() => {
+    let increasedMainDate =  increasedate(startTime);
+    let endtimeDate =  dynamicDate(increasedMainDate);
+   let id = uniqueEvent.id
+   const editedData  = state.map((elem)=>{
+    if (elem.id === id) {
+  return  {  ...elem,
+      start : startTime,
+      end : endtimeDate,
+      title : select,}
+    }
+    return elem;
+  });
+  setState([...editedData]);
+   
+  }, [select])
+
+  const event_color = () => {
     if (select === "Well Visit") {
-      setEvent_Color("grey");
+      setEvent_Color ("grey");
     } else if (select === "New Patient") {
       setEvent_Color("red");
     } else if (select === "Evaluation") {
@@ -181,31 +245,32 @@ console.log(state2);
   };
 
   // const injectCellComponent = (args)=>{
- 
+
   // }
 
   // const saveRecords = (date)=>{
   //   alert(`you clicked on ${date}`)
   // }
 
-  const setDateRange = (DatesSetArg)=>{ //Setting range of time
-     setRange({start:DatesSetArg.start, end: DatesSetArg.end })
-  }
-// console.log(range);
-const handleEventRecieve =()=>{
-  alert( 'event changed');
-}
-const handleDrop = (info)=>{
-  // alert(info.event.title + " was dropped on " + info.event.start.toISOString());
-  editDate()
-}
-const handleMouseOver = ()=>{
-  setDetailModal(true)
-}
-const handleMouseOut = ()=>{
-  setDetailModal(false)
-}
-// const eventContentHandle = (arg)=>{
+  const setDateRange = (DatesSetArg) => {
+    //Setting range of time
+    setRange({ start: DatesSetArg.start, end: DatesSetArg.end });
+  };
+  // console.log(range);
+  const handleEventRecieve = () => {
+    alert("event changed");
+  };
+  const handleDrop = (info) => {
+    // alert(info.event.title + " was dropped on " + info.event.start.toISOString());
+    editDate();
+  };
+  const handleMouseOver = () => {
+    setDetailModal(true);
+  };
+  const handleMouseOut = () => {
+    setDetailModal(false);
+  };
+  // const eventContentHandle = (arg)=>{
   // console.log(arg.event._def.title);
   // return(
   //   <div onMouseOver={handleMouseOver} onMouseOut={handleMouseOut} className="contentHandle" >
@@ -213,13 +278,13 @@ const handleMouseOut = ()=>{
   //   <p>{arg.event._def.title}</p>
   //   <p>{arg.event._def.title}</p>
   //   </div>
-    
+
   //   </div>
   // )
-// }
-const eventLocation=(event)=>{
-   return event.rendering === 'background';
-}
+  // }
+  const eventLocation = (event) => {
+    return event.rendering === "background";
+  };
 
   return (
     <div className="App">
@@ -228,32 +293,33 @@ const eventLocation=(event)=>{
         initialView="timeGridWeek"
         editable={true}
         headerToolbar={{
-          left:'',
-          right:'',
+          left: "",
+          right: "",
           // center: "dayGridMonth,timeGridWeek,timeGridDay new",
         }}
+        nowIndicator="true"
         // eventLimit = {true} // for all non-TimeGrid views
-        dayHeaderContent= {(args) => {
-          return dayjs(args.date).format('dddd')
-      }}
+        dayHeaderContent={(args) => {
+          return dayjs(args.date).format("dddd");
+        }}
         // columnHeaderFormat='dddd'
         weekends={true}
-        firstDay='1'
-        slotDuration= '00:30:00' 
-        slotLabelInterval= '00:30:00' 
-        slotMinTime = "07:00:00"
-        slotMaxTime = "20:00:00"
+        firstDay="1"
+        slotDuration="00:30:00"
+        slotLabelInterval="00:30:00"
+        slotMinTime="07:00:00"
+        slotMaxTime="20:00:00"
         customButtons={{
           new: {
             text: "new",
-            click: () => console.log("new event"),
+            // click: () => console.log("new event"),
           },
         }}
         selectable={true}
-        selectOverlap = {()=>eventLocation()}
+        selectOverlap={() => eventLocation()}
         // droppable= {true}
         eventDrop={handleDrop}
-        eventReceive={()=>handleEventRecieve()}
+        eventReceive={() => handleEventRecieve()}
         datesSet={setDateRange}
         // dayCellContent = {injectCellComponent}
         allDaySlot={false}
@@ -266,28 +332,37 @@ const eventLocation=(event)=>{
       {isModal ? (
         <Modal
           selectHandle={selectHandle}
-          state1={state1}
+         
           select={select}
           setSelect={setSelect}
-          state2={state2}
-          setState2={setState2}
-          setState1={setState1}
+         
           setModal={setModal}
-          submitData={submitData}
+          onChangeEncounter={onChangeNewEncounter}
+          jsxdata = {jsxdata}
+          setJsxData={setJsxData}
+          editDate={editDate}
+          deleteEventHandle={deleteEventHandle}
         />
       ) : (
         ""
       )}
-      { detailModal?
-        <DetailModal setIseditable={setIseditable}
-        editDate={editDate}
-        state1={state1} setDetailModal={setDetailModal} deleteEventHandle={deleteEventHandle} event_Color={event_Color} /> :""
-      }
+      {detailModal ? (
+        <DetailModal
+          setIseditable={setIseditable}
+          editDate={editDate}
+          state1={uniqueEvent}
+          setDetailModal={setDetailModal}
+          deleteEventHandle={deleteEventHandle}
+          event_Color={event_Color}
+        />
+      ) : (
+        ""
+      )}
       {iseditable ? (
         <EditableDate
-        setIseditable={setIseditable}
+          setIseditable={setIseditable}
           editDate={editDate}
-          state1={state1}
+          state1={uniqueEvent}
         />
       ) : (
         ""

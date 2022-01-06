@@ -64,8 +64,17 @@
 }
 
 .dropDownItem1{
-  background-color: rgb(167, 210, 228) !important;
-  border: 2px solid rgb(226, 138, 138);
+  border: none;
+  background: #fff;
+  border-bottom: 2px solid grey;
+  color: grey;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 2px 10px;
+}
+*:focus {
+  outline: none;
+  background: #fff;
 }
 .btn{
   width: 100%;
@@ -184,4 +193,7 @@
 }
 .data{
   margin-left: auto;
+}
+.fc table{
+  border: 1px solid red;
 }
